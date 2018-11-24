@@ -2,6 +2,7 @@ package org.vitoliu.beans;
 
 import java.util.Map;
 
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import org.vitoliu.beans.io.ResourceLoader;
 
@@ -18,8 +19,9 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 	/**
 	 * 通过String->BeanDefinition存储IOC容器中的类定义
+	 * String:默认bean标签的id
 	 */
-	private Map<String, BeanDefinition<?>> registry;
+	private Map<String, BeanDefinition> registry;
 
 	/**
 	 * 保存了资源加载器，将加载过后的BeanDefinition保存到registry中
@@ -31,6 +33,7 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	 * @param resourceLoader
 	 */
 	protected AbstractBeanDefinitionReader(ResourceLoader resourceLoader) {
+		this.registry = Maps.newHashMap();
 		this.resourceLoader = resourceLoader;
 	}
 }

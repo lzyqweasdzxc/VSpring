@@ -9,7 +9,7 @@ package org.vitoliu.beans.factory;
  * @author yukun.liu
  * @since 23 十一月 2018
  */
-public interface BeanFactory<T> {
+public interface BeanFactory {
 
 	/**
 	 * 通过 getBean(String) 方法来 获取bean实例
@@ -17,5 +17,5 @@ public interface BeanFactory<T> {
 	 * @return
 	 * @throws Exception
 	 */
-	T getBean(String name) throws Exception;
+	Object getBean(String name) throws Exception;
 }

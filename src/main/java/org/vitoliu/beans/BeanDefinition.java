@@ -19,19 +19,19 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @NoArgsConstructor
 @Slf4j
-public class BeanDefinition<T> {
+public class BeanDefinition {
 
 
 	/**
 	 * Bean
 	 */
-	private T bean;
+	private Object bean;
 
 	/**
 	 * bean的类型
 	 * 根据类型可以生成一个实例，然后把各种属性注入进去
 	 */
-	private Class<?> beanClass;
+	private Class beanClass;
 
 	/**
 	 * bean的名称

@@ -27,7 +27,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * 实例化父类，启动时加载资源，解析出BeanDefinition后放入父类的registry中保存
 	 * @param resourceLoader
 	 */
-	protected XmlBeanDefinitionReader(ResourceLoader resourceLoader) {
+	public XmlBeanDefinitionReader(ResourceLoader resourceLoader) {
 		super(resourceLoader);
 	}
 
@@ -98,7 +98,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @param bean
 	 * @param beanDefinition
 	 */
-	private void processProperty(Element bean, BeanDefinition<?> beanDefinition) {
+	private void processProperty(Element bean, BeanDefinition beanDefinition) {
 		// 获取所有property标签
 		NodeList propertyNodes = bean.getElementsByTagName(BeanLabelConstants.PROPERTY);
 		for (int i = 0; i < propertyNodes.getLength(); i++) {

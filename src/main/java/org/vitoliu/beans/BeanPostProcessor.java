@@ -9,7 +9,7 @@ package org.vitoliu.beans;
  * @author yukun.liu
  * @since 24 十一月 2018
  */
-public interface BeanPostProcessor<T> {
+public interface BeanPostProcessor {
 
 	/**
 	 * 前置处理
@@ -18,7 +18,7 @@ public interface BeanPostProcessor<T> {
 	 * @return
 	 * @throws Exception
 	 */
-	T postProcessBeforeInitialization(T bean, String beanName) throws Exception;
+	Object postProcessBeforeInitialization(Object bean, String beanName) throws Exception;
 
 	/**
 	 * 后置处理
@@ -27,5 +27,5 @@ public interface BeanPostProcessor<T> {
 	 * @return
 	 * @throws Exception
 	 */
-	T postProcessAfterInitialization(T bean, String beanName) throws Exception;
+	Object postProcessAfterInitialization(Object bean, String beanName) throws Exception;
 }

@@ -15,14 +15,14 @@ import org.vitoliu.beans.BeanPostProcessor;
  * @author yukun.liu
  * @since 23 十一月 2018
  */
-public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
+public abstract class AbstractBeanFactory implements BeanFactory {
 
 	/**
 	 * key:bean的名称
 	 * value:bean的定义信息
 	 * threadSafe
 	 */
-	ConcurrentMap<String, BeanDefinition<T>> beanDefinitionConcurrentMap = Maps.newConcurrentMap();
+	private ConcurrentMap<String, BeanDefinition> beanDefinitionConcurrentMap = Maps.newConcurrentMap();
 
 	/**
 	 * 保存完成注册的bean的name
@@ -33,7 +33,7 @@ public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
 	 * 增加bean处理程序：
 	 * 例如通过AspectJAwareAdvisorAutoProxyCreator#postProcessAfterInitialization()实现AOP的织入
 	 */
-	private List<BeanPostProcessor<T>> beanPostProcessors = Lists.newArrayList();
+	private List<BeanPostProcessor> beanPostProcessors = Lists.newArrayList();
 
 	/**
 	 * 根据名字获取bean实例(实例化并初始化bean)
@@ -42,19 +42,19 @@ public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
 	 * @throws Exception
 	 */
 	@Override
-	public T getBean(String name) throws Exception {
+	public Object getBean(String name) throws Exception {
 		//获取该bean的定义
-		BeanDefinition<T> beanDefinition = beanDefinitionConcurrentMap.get(name);
+		BeanDefinition beanDefinition = beanDefinitionConcurrentMap.get(name);
 		//若没有，抛异常
 		if (beanDefinition == null) {
 			throw new IllegalArgumentException("No bean named " + name + "is defined");
 		}
-		T bean = beanDefinition.getBean();
+		Object bean = beanDefinition.getBean();
 		//如果该bean还没被装配
 		if (bean == null) {
 			//装配bean(初始化+注入属性）
-			//生成相关代理类,用于实现AOP织入
 			bean = doCreateBean(beanDefinition);
+			//生成相关代理类,用于实现AOP织入
 			bean = initializeBean(bean, name);
 			beanDefinition.setBean(bean);
 		}
@@ -69,19 +69,19 @@ public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
 	 * @return Object
 	 * @throws Exception
 	 */
-	private T initializeBean(T bean, String name) throws Exception {
-		for (BeanPostProcessor<T> beanPostProcessor : beanPostProcessors) {
+	private Object initializeBean(Object bean, String name) throws Exception {
+		for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
 			bean = beanPostProcessor.postProcessBeforeInitialization(bean, name);
 		}
-		for (BeanPostProcessor<T> beanPostProcessor : beanPostProcessors) {
+		for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {
 			bean = beanPostProcessor.postProcessAfterInitialization(bean, name);
 		}
 		return bean;
 	}
 
-	private T doCreateBean(BeanDefinition<T> beanDefinition) throws Exception {
+	private Object doCreateBean(BeanDefinition beanDefinition) throws Exception {
 		//实例化bean
-		T bean = createBeanInstance(beanDefinition);
+		Object bean = createBeanInstance(beanDefinition);
 		beanDefinition.setBean(bean);
 		injectPropertyValues(bean, beanDefinition);
 		return bean;
@@ -95,9 +95,9 @@ public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
 	 * @return Object
 	 * @throws Exception
 	 */
-	protected abstract T injectPropertyValues(Object bean, BeanDefinition<T> beanDefinition) throws Exception;
+	protected abstract void injectPropertyValues(Object bean, BeanDefinition beanDefinition) throws Exception;
 
-	private T createBeanInstance(BeanDefinition<T> beanDefinition) throws IllegalAccessException, InstantiationException {
+	private Object createBeanInstance(BeanDefinition beanDefinition) throws IllegalAccessException, InstantiationException {
 		return beanDefinition.getBeanClass().newInstance();
 	}
 
@@ -117,9 +117,11 @@ public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<T> getBeansOfType(Class<T> type) throws Exception {
-		List<T> beans = Lists.newArrayList();
+	public List getBeansOfType(Class<?> type) throws Exception {
+		List beans = Lists.newArrayList();
 		for (String beanDefinitionName : beanDefinitionNames) {
+//			boolean isAssignableFrom(Class<?> cls)
+//			判定此 Class 对象所表示的类或接口与指定的 Class 参数所表示的类或接口是否相同，或是否是其超类或超接口。
 			if (type.isAssignableFrom(beanDefinitionConcurrentMap.get(beanDefinitionName).getBeanClass())) {
 				beans.add(getBean(beanDefinitionName));
 			}
@@ -132,7 +134,7 @@ public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
 	 * @param name
 	 * @param beanDefinition
 	 */
-	public void registerBeanDefinition(String name, BeanDefinition<T> beanDefinition) {
+	public void registerBeanDefinition(String name, BeanDefinition beanDefinition) {
 		beanDefinitionConcurrentMap.put(name, beanDefinition);
 		beanDefinitionNames.add(name);
 	}
@@ -141,7 +143,7 @@ public abstract class AbstractBeanFactory<T> implements BeanFactory<T> {
 	 * 添加处理器
 	 * @param beanPostProcessor
 	 */
-	public void addBeanPostProcessors(BeanPostProcessor<T> beanPostProcessor) {
+	public void addBeanPostProcessors(BeanPostProcessor beanPostProcessor) {
 		this.beanPostProcessors.add(beanPostProcessor);
 	}
 }
